@@ -24,15 +24,54 @@
                 </div>
               </q-img>
 
-              <q-card-section>
+              <q-card-section class="dots">
                 {{ item.body }}
+                <q-card-actions align="right" style="padding-bottom: 0!important;">
+                  <q-btn flat @click="dialog[item.id] = true">Read
+                    More</q-btn>
+                </q-card-actions>
               </q-card-section>
+              <template v-if="dialog[item.id]">
+                <q-dialog v-model="dialog[item.id]" persistent style="backdrop-filter: blur(10px);">
+                  <q-card>
+                    <q-item>
+                      <q-item-section avatar>
+                        <q-avatar>
+                          <img src="/src/assets/profile-user-black.png">
+                        </q-avatar>
+                      </q-item-section>
+
+                      <q-item-section>
+                        <q-item-label>{{ item.userId }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
+                      <div class="absolute-bottom text-h6">
+                        {{ item.title }}
+                      </div>
+                    </q-img>
+
+                    <q-card-section>
+                      {{ item.body }}
+                      <q-card-actions align="right" style="padding-bottom: 0!important;">
+                        <q-btn flat @click="dialog[item.id] = false">Close</q-btn>
+                      </q-card-actions>
+                    </q-card-section>
+                  </q-card>
+                </q-dialog>
+              </template>
               <q-separator />
 
               <q-card-actions>
-                <q-icon @click="doStuff($event)" class="q-pa-sm" id="heart" name="far fa-heart" size="25px" />
+                <q-icon v-if="obj2.some(e => e.userId === item.userId && e.Id === item.id)"
+                  @click="doStuff({ userId: item.userId, Id: item.id }, $event)" class="q-pa-sm" id="heart"
+                  name="fas fa-heart" size="25px" style="color: red;" />
+                <q-icon v-else @click="doStuff({ userId: item.userId, Id: item.id }, $event)" class="q-pa-sm" id="heart"
+                  name="far fa-heart" size="25px" />
               </q-card-actions>
             </q-card>
+
+
           </template>
           <template #fallback>
             <q-spinner-hourglass size=" 50px" color="primary" />
@@ -41,7 +80,39 @@
         </Suspense>
       </div>
       <div v-else>
-        <q-table title="Table" :rows="rows" :columns="columns" row-key="name" />
+        <q-table title="Table" :rows="rows" :columns="columns" row-key="name" style="cursor: pointer;" />
+
+        <!-- TODOò' -->
+        <template v-if="dialog[rows.id]">
+          <q-dialog v-model="dialog[rows.id]" persistent style="backdrop-filter: blur(10px);">
+            <q-card style="min-width: 40%;">
+
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <img src="/src/assets/profile-user-black.png">
+                  </q-avatar>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>{{ rows.utente }}{{ rows.id }}{{ single }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
+                <div class="absolute-bottom text-h6">
+                  {{ rows.title }}
+                </div>
+              </q-img>
+
+              <q-card-section>
+                {{ rows.body }}
+                <q-card-actions align="right" style="padding-bottom: 0!important;">
+                  <q-btn flat @click="dialog[rows.id] = false">Close</q-btn>
+                </q-card-actions>
+              </q-card-section>
+            </q-card>
+          </q-dialog>
+        </template>
       </div>
     </div>
   </q-page>
@@ -49,45 +120,59 @@
 
 
 <script setup>
-import { defineComponent, ref, onBeforeMount } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { api } from 'boot/axios'
+import { PostsLikeStore } from 'stores/posts'
 
-function doStuff(event) {
+const store = PostsLikeStore()
+
+
+function doStuff(obj, event) {
   if (event.target.classList.contains('far')) {
     event.target.classList.remove('far')
     event.target.classList.add('fas')
     event.target.style.color = "red"
+    store.addLike(obj)
   } else {
     event.target.classList.remove('fas')
     event.target.classList.add('far')
     event.target.style.color = "black"
+    store.removeLike(obj)
   }
 }
 
-const sos = ref([]);
-const rows = []
-const columns = [
-  {
-    name: 'utente',
-    label: 'Utente',
-    align: 'left',
-    field: 'utente',
-    sortable: true
-  },
-  {
-    name: 'title',
-    label: 'Title',
-    align: 'center',
-    field: 'title',
-    sortable: true
-  },
-  {
-    name: 'body',
-    label: 'Body',
-    align: 'center',
-    field: 'body',
-    sortable: true
-  }
+let dialog = ref([])
+let obj2 = [];
+let sos = ref([]);
+let rows = []
+const columns = [{
+  name: 'id',
+  label: 'Id',
+  align: 'left',
+  field: 'id',
+  sortable: true
+},
+{
+  name: 'utente',
+  label: 'Utente',
+  align: 'left',
+  field: 'utente',
+  sortable: true
+},
+{
+  name: 'title',
+  label: 'Title',
+  align: 'center',
+  field: 'title',
+  sortable: true
+},
+{
+  name: 'body',
+  label: 'Body',
+  align: 'center',
+  field: 'body',
+  sortable: true
+}
 ]
 const choose = ref('Grid')
 
@@ -100,20 +185,16 @@ const getData = async () => {
 
 }
 getData().then((result) => {
+  obj2 = JSON.parse(JSON.stringify(store.getLikes))
   result.forEach(element => {
     sos.value.push(element)
-    rows.push({ utente: element.userId, title: element.title, body: element.body })
+    rows.push({ id: element.id, utente: element.userId, title: element.title, body: element.body })
   });
+  dialog.value = new Array(sos.value.length).fill(false)
 })
 
 
 onBeforeMount(() => {
-  // console.log("akubfhkabfk")
-  // getData().then((result) => {
-  //   result.forEach(element => {
-  //     sos.push(element)
-  //     rows.push({ utente: element.userId, title: element.title, body: element.body })
-  //   });
-  // })
+
 })
 </script>
