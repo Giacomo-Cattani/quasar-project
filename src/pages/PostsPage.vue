@@ -27,10 +27,15 @@
               <q-card-section>
                 {{ item.body }}
               </q-card-section>
+              <q-separator />
+
+              <q-card-actions>
+                <q-icon @click="doStuff($event)" class="q-pa-sm" id="heart" name="far fa-heart" size="25px" />
+              </q-card-actions>
             </q-card>
           </template>
           <template #fallback>
-            <q-spinner-hourglass size="50px" color="primary" />
+            <q-spinner-hourglass size=" 50px" color="primary" />
           </template>
 
         </Suspense>
@@ -47,6 +52,17 @@
 import { defineComponent, ref, onBeforeMount } from 'vue'
 import { api } from 'boot/axios'
 
+function doStuff(event) {
+  if (event.target.classList.contains('far')) {
+    event.target.classList.remove('far')
+    event.target.classList.add('fas')
+    event.target.style.color = "red"
+  } else {
+    event.target.classList.remove('fas')
+    event.target.classList.add('far')
+    event.target.style.color = "black"
+  }
+}
 
 const sos = ref([]);
 const rows = []
@@ -76,12 +92,10 @@ const columns = [
 const choose = ref('Grid')
 
 const getData = async () => {
-  console.log("akubfhkabfk")
   try {
     const { data: result } = await api.get('/posts')
     return result
   } catch (e) {
-    console.log(e.message)
   }
 
 }
@@ -91,9 +105,7 @@ getData().then((result) => {
     rows.push({ utente: element.userId, title: element.title, body: element.body })
   });
 })
-// console.log(getData())
 
-console.log(sos.value)
 
 onBeforeMount(() => {
   // console.log("akubfhkabfk")
