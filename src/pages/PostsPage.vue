@@ -80,11 +80,15 @@
         </Suspense>
       </div>
       <div v-else>
-        <q-table title="Table" :rows="rows" :columns="columns" row-key="name" style="cursor: pointer;" />
 
-        <!-- TODOò' -->
-        <template v-if="dialog[rows.id]">
-          <q-dialog v-model="dialog[rows.id]" persistent style="backdrop-filter: blur(10px);">
+        <q-table title="Table" :rows="rows" :columns="columns" row-key="name" style="cursor: pointer;"
+          @row-click="onRowClick" />
+
+
+
+        <!-- TODO -->
+        <template v-if="selectedmaybe == true">
+          <q-dialog v-model="selectedmaybe" persistent style="backdrop-filter: blur(10px);">
             <q-card style="min-width: 40%;">
 
               <q-item>
@@ -95,19 +99,20 @@
                 </q-item-section>
 
                 <q-item-section>
-                  <q-item-label>{{ rows.utente }}{{ rows.id }}{{ single }}</q-item-label>
+                  <q-item-label>{{ rows[idnum - 1].utente }}</q-item-label>
                 </q-item-section>
               </q-item>
               <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
                 <div class="absolute-bottom text-h6">
-                  {{ rows.title }}
+                  {{ rows[idnum - 1].title }}
                 </div>
               </q-img>
 
               <q-card-section>
-                {{ rows.body }}
+                {{ rows[idnum - 1].body }}
                 <q-card-actions align="right" style="padding-bottom: 0!important;">
-                  <q-btn flat @click="dialog[rows.id] = false">Close</q-btn>
+                  <q-btn flat
+                    @click="dialog.value[idnum] = false; console.log(idnum.value + ' : ' + dialog.value[idnum])">Close</q-btn>
                 </q-card-actions>
               </q-card-section>
             </q-card>
@@ -126,6 +131,14 @@ import { PostsLikeStore } from 'stores/posts'
 
 const store = PostsLikeStore()
 
+function onRowClick(evt, row) {
+  console.log("ciao")
+  selectedmaybe = true;
+  // idnum = row.id - 1
+  // dialog.value[idnum] = true
+  // console.log(idnum + " : " + dialog.value[idnum])
+  // console.log(dialog.value.indexOf(true))
+}
 
 function doStuff(obj, event) {
   if (event.target.classList.contains('far')) {
@@ -141,7 +154,9 @@ function doStuff(obj, event) {
   }
 }
 
-let dialog = ref([])
+let selectedmaybe = false;
+let idnum = 0
+let dialog = []
 let obj2 = [];
 let sos = ref([]);
 let rows = []
