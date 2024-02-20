@@ -26,6 +26,7 @@ export default store((/* { ssrContext } */) => {
       context.store.$patch(fromStorage)
     }
 
+
     context.store.$subscribe((mutation, state) => {
       window.localStorage.setItem(storeId, serializer.serialize(state))
     });
