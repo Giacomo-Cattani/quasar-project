@@ -1,5 +1,6 @@
 import { store } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 /*
 
@@ -13,24 +14,25 @@ with the Store instance.
 
 export default store((/* { ssrContext } */) => {
   const pinia = createPinia()
+  pinia.use(piniaPluginPersistedstate)
 
-  pinia.use((context) => {
-    const storeId = context.store.$id
-    const serializer = {
-      serialize: (state) => JSON.stringify(state),
-      deserialize: (state) => JSON.parse(state)
-    }
+  // pinia.use((context) => {
+  //   const storeId = context.store.$id
+  //   const serializer = {
+  //     serialize: (state) => JSON.stringify(state),
+  //     deserialize: (state) => JSON.parse(state)
+  //   }
 
-    const fromStorage = serializer.deserialize(window.localStorage.getItem(storeId))
-    if (fromStorage) {
-      context.store.$patch(fromStorage)
-    }
+  //   const fromStorage = serializer.deserialize(window.localStorage.getItem(storeId))
+  //   if (fromStorage) {
+  //     context.store.$patch(fromStorage)
+  //   }
 
 
-    context.store.$subscribe((mutation, state) => {
-      window.localStorage.setItem(storeId, serializer.serialize(state))
-    });
-  });
+  //   context.store.$subscribe((mutation, state) => {
+  //     window.localStorage.setItem(storeId, serializer.serialize(state))
+  //   });
+  // });
 
   return pinia
 })

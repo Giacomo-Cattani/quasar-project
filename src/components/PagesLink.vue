@@ -1,5 +1,6 @@
 <template >
-  <q-item v-show="route != router.currentRoute.value.path && route != '/:catchAll(.*)*'" clickable :to="route">
+  <q-item v-show="route != router.currentRoute.value.path && route != '/:catchAll(.*)*' && route != '/login'" clickable
+    :to="route">
 
     <q-item-section>
       <q-item-label>{{ title }}</q-item-label>

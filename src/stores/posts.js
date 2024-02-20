@@ -3,11 +3,15 @@ import { defineStore } from 'pinia';
 
 export const PostsLikeStore = defineStore('postlikestore', {
   state: () => ({
-    likes: []
+    likes: [],
+    expirationDate: null
   }),
   getters: {
     getLikes() {
       return this.likes;
+    },
+    isLogged() {
+      return this.expirationDate > Date.now();
     }
   },
   actions: {
@@ -21,5 +25,9 @@ export const PostsLikeStore = defineStore('postlikestore', {
     searchLikedPost(obj) {
       return this.likes.find((element) => element === obj);
     },
+    addLoggedUser(expirationDate) {
+      this.expirationDate = expirationDate;
+    }
   },
+  persist: true,
 });

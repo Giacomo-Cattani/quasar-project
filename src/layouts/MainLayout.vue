@@ -8,7 +8,7 @@
           Quasar App
         </q-toolbar-title>
 
-        <q-avatar @click="console.log('Ciao')" class="cursor-pointer">
+        <q-avatar @click="router.push('/login')" class="cursor-pointer">
           <img src="../assets/profile-user.png">
         </q-avatar>
         <q-btn flat dense round icon="login" aria-label="Settings" class="q-ml-sm" />

@@ -129,6 +129,10 @@ import { ref, onBeforeMount } from 'vue'
 import { api } from 'boot/axios'
 import { PostsLikeStore } from 'stores/posts'
 
+import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
 const store = PostsLikeStore()
 
 function Selected() {
@@ -150,7 +154,9 @@ function onRowClick(evt, row) {
 }
 
 function doStuff(obj, event) {
-  if (event.target.classList.contains('far')) {
+  if (store.isLogged === false) {
+    showNotif()
+  } else if (event.target.classList.contains('far')) {
     event.target.classList.remove('far')
     event.target.classList.add('fas')
     event.target.style.color = "red"
@@ -163,6 +169,7 @@ function doStuff(obj, event) {
   }
 }
 
+const $q = useQuasar()
 let selectedmaybe = ref(false)
 let selectedSize = ref(6)
 let options = [6, 12, 24, 'All']
@@ -210,6 +217,16 @@ const getData = async () => {
   }
 
 }
+
+
+function showNotif() {
+
+  $q.notify({
+    message: 'Devi essere loggato per mettere like',
+    color: 'purple'
+  })
+}
+
 getData().then((result) => {
   obj2 = JSON.parse(JSON.stringify(store.getLikes))
   result.forEach(element => {
