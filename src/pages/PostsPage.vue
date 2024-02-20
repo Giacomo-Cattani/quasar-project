@@ -2,11 +2,15 @@
 <template>
   <q-page>
     <div class="q-pa-md">
-      <q-toggle :label="choose" color="green" false-value="Table" true-value="Grid" v-model="choose" />
-      <div v-if="choose == 'Grid'" class="q-pa-md row items-start q-gutter-md">
+      <div style="display: flex; justify-content: space-between;">
+        <q-toggle :label="choose" color="green" false-value="Table" true-value="Grid" v-model="choose" />
+        <q-select v-if="choose == 'Grid'" outlined v-model="selectedSize" :options="options" label="Size"
+          @update:model-value="Selected()" style="min-width: 100px;" />
+      </div>
+      <div v-if="choose == 'Grid'" class=" q-pa-md row items-start q-gutter-md">
         <Suspense>
           <template #default>
-            <q-card v-for="item in sos" :key="item.id" class="my-card" style="max-width: 30%;">
+            <q-card v-for="item in var2" :key="item.id" class="my-card" style="max-width: 30%">
               <q-item>
                 <q-item-section avatar>
                   <q-avatar>
@@ -72,6 +76,7 @@
             </q-card>
 
 
+
           </template>
           <template #fallback>
             <q-spinner-hourglass size=" 50px" color="primary" />
@@ -84,40 +89,35 @@
         <q-table title="Table" :rows="rows" :columns="columns" row-key="name" style="cursor: pointer;"
           @row-click="onRowClick" />
 
+        <q-dialog v-model="dialog[selectedmaybe]" persistent style="backdrop-filter: blur(10px);">
+          <q-card style="min-width: 40%;">
 
+            <q-item>
+              <q-item-section avatar>
+                <q-avatar>
+                  <img src="/src/assets/profile-user-black.png">
+                </q-avatar>
+              </q-item-section>
 
-        <!-- TODO -->
-        <template v-if="selectedmaybe == true">
-          <q-dialog v-model="selectedmaybe" persistent style="backdrop-filter: blur(10px);">
-            <q-card style="min-width: 40%;">
+              <q-item-section>
+                <q-item-label>{{ rows[selectedmaybe].utente }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
+              <div class="absolute-bottom text-h6">
+                {{ rows[selectedmaybe].title }}
+              </div>
+            </q-img>
 
-              <q-item>
-                <q-item-section avatar>
-                  <q-avatar>
-                    <img src="/src/assets/profile-user-black.png">
-                  </q-avatar>
-                </q-item-section>
+            <q-card-section>
+              {{ rows[selectedmaybe].body }}
+              <q-card-actions align="right" style="padding-bottom: 0!important;">
+                <q-btn flat @click="dialog[selectedmaybe] = false">Close</q-btn>
+              </q-card-actions>
+            </q-card-section>
+          </q-card>
+        </q-dialog>
 
-                <q-item-section>
-                  <q-item-label>{{ rows[idnum - 1].utente }}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-img src="https://cdn.quasar.dev/img/parallax2.jpg">
-                <div class="absolute-bottom text-h6">
-                  {{ rows[idnum - 1].title }}
-                </div>
-              </q-img>
-
-              <q-card-section>
-                {{ rows[idnum - 1].body }}
-                <q-card-actions align="right" style="padding-bottom: 0!important;">
-                  <q-btn flat
-                    @click="dialog.value[idnum] = false; console.log(idnum.value + ' : ' + dialog.value[idnum])">Close</q-btn>
-                </q-card-actions>
-              </q-card-section>
-            </q-card>
-          </q-dialog>
-        </template>
       </div>
     </div>
   </q-page>
@@ -131,9 +131,18 @@ import { PostsLikeStore } from 'stores/posts'
 
 const store = PostsLikeStore()
 
+function Selected() {
+  if (selectedSize.value == 'All') {
+    selectedSize.value = sos.value.length
+  }
+  ChangeSize()
+}
+
 function onRowClick(evt, row) {
-  console.log("ciao")
-  selectedmaybe = true;
+  let num = row.id - 1
+  dialog.value[num] = true
+  selectedmaybe.value = num
+  console.log(num + " : " + dialog[selectedmaybe.value])
   // idnum = row.id - 1
   // dialog.value[idnum] = true
   // console.log(idnum + " : " + dialog.value[idnum])
@@ -154,12 +163,14 @@ function doStuff(obj, event) {
   }
 }
 
-let selectedmaybe = false;
-let idnum = 0
-let dialog = []
+let selectedmaybe = ref(false)
+let selectedSize = ref(6)
+let options = [6, 12, 24, 'All']
+let dialog = ref([])
 let obj2 = [];
 let sos = ref([]);
-let rows = []
+let rows = ref([])
+let var2 = ref([])
 const columns = [{
   name: 'id',
   label: 'Id',
@@ -203,13 +214,14 @@ getData().then((result) => {
   obj2 = JSON.parse(JSON.stringify(store.getLikes))
   result.forEach(element => {
     sos.value.push(element)
-    rows.push({ id: element.id, utente: element.userId, title: element.title, body: element.body })
+    rows.value.push({ id: element.id, utente: element.userId, title: element.title, body: element.body })
   });
+  var2.value = JSON.parse(JSON.stringify([...sos.value.slice(0, selectedSize.value)]))
   dialog.value = new Array(sos.value.length).fill(false)
 })
 
+function ChangeSize() {
+  var2.value = JSON.parse(JSON.stringify([...sos.value.slice(0, selectedSize.value)]))
+}
 
-onBeforeMount(() => {
-
-})
 </script>
