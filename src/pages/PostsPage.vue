@@ -146,11 +146,6 @@ function onRowClick(evt, row) {
   let num = row.id - 1
   dialog.value[num] = true
   selectedmaybe.value = num
-  console.log(num + " : " + dialog[selectedmaybe.value])
-  // idnum = row.id - 1
-  // dialog.value[idnum] = true
-  // console.log(idnum + " : " + dialog.value[idnum])
-  // console.log(dialog.value.indexOf(true))
 }
 
 function doStuff(obj, event) {
@@ -223,7 +218,9 @@ function showNotif() {
 
   $q.notify({
     message: 'Devi essere loggato per mettere like',
-    color: 'purple'
+    color: 'purple',
+    timeout: 1000,
+    position: 'top'
   })
 }
 

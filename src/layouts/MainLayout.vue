@@ -11,7 +11,8 @@
         <q-avatar @click="router.push('/login')" class="cursor-pointer">
           <img src="../assets/profile-user.png">
         </q-avatar>
-        <q-btn flat dense round icon="login" aria-label="Settings" class="q-ml-sm" />
+        <q-btn @click="store.$reset()" :to="`/login`" flat dense round icon="login" aria-label="Settings"
+          class="q-ml-sm" />
       </q-toolbar>
     </q-header>
 
@@ -43,7 +44,9 @@ import EssentialLink from 'components/EssentialLink.vue'
 import { computed } from 'vue';
 import { useRouter } from 'vue-router'
 import PagesLink from 'src/components/PagesLink.vue';
+import { PostsLikeStore } from 'stores/posts'
 
+const store = PostsLikeStore()
 const router = useRouter();
 
 const toggleLeftDrawer = computed(() =>

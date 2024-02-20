@@ -1,17 +1,21 @@
 
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const PostsLikeStore = defineStore('postlikestore', {
   state: () => ({
     likes: [],
-    expirationDate: null
+    expirationDate: new Date(),
+    username: '',
+    psw: '',
   }),
   getters: {
     getLikes() {
       return this.likes;
     },
     isLogged() {
-      return this.expirationDate > Date.now();
+      let date = new Date();
+      return this.expirationDate > date.getTime();
     }
   },
   actions: {
@@ -19,14 +23,16 @@ export const PostsLikeStore = defineStore('postlikestore', {
       this.likes.push(obj);
     },
     removeLike(obj) {
-      const objLike = this.searchLikedPost(obj);
-      this.likes.splice(this.likes.indexOf(objLike), 1);
+      const objLike = this.searchLikedPost(obj)
+      this.likes.splice(objLike, 1);
     },
     searchLikedPost(obj) {
-      return this.likes.find((element) => element === obj);
+      return this.likes.findIndex((like) => like.userId === obj.userId && like.Id === obj.Id);
     },
-    addLoggedUser(expirationDate) {
-      this.expirationDate = expirationDate;
+    addLoggedUser(data, username, psw) {
+      this.expirationDate = data;
+      this.username = username;
+      this.psw = psw;
     }
   },
   persist: true,

@@ -20,7 +20,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useQuasar } from 'quasar';
+import { useQuasar, QSpinnerGears } from 'quasar';
 import { PostsLikeStore } from 'stores/posts'
 import { useRouter } from 'vue-router';
 import { onBeforeMount } from 'vue';
@@ -30,39 +30,35 @@ const store = PostsLikeStore()
 let username = ref('');
 let password = ref('');
 const $q = useQuasar()
-let user = ref({ username: 'pippo', password: 'ciao123' })
 
 function Login() {
-  console.log('Username: ', username.value);
-  console.log('Password: ', password.value);
-  if (username.value === user.value.username && password.value === user.value.password) {
+  if (username.value === "admin" && password.value === "admin") {
     $q.notify({
+      spinner: QSpinnerGears,
       message: 'Verrai reindirizzato alla pagina principale...',
-      color: 'purple'
+      color: 'green',
+      position: 'top',
+      timeout: 2000
     })
-
-    /*TODO*/
     setTimeout(() => {
       var date = new Date();
-      date.setDate(date.getDate() + 1);
-      store.addLoggedUser(date)
+      date.setDate(date.getDate() + 1)
+      store.addLoggedUser(date.getTime(), username.value, password.value)
       router.push('/')
-    }, 2000);
-
-    console.log('Login successful');
+    }, 2500);
   } else {
     $q.notify({
       message: 'Username o Password errati',
-      color: 'purple'
+      color: 'red',
+      timeout: 2000,
+      position: 'top'
     })
     username.value = ''
     password.value = ''
-    console.log('Login failed');
   }
 }
 
 onBeforeMount(() => {
-  console.log(store.isLogged)
   if (store.isLogged) {
     router.push('/')
   }
