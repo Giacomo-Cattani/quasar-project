@@ -10,7 +10,7 @@
       <div v-if="choose == 'Grid'" class=" q-pa-md row items-start q-gutter-md">
         <Suspense>
           <template #default>
-            <q-card v-for="item in var2" :key="item.id" class="my-card" style="max-width: 30%">
+            <q-card v-for="item in var2" :key="item.id" class="my-card col-4" style="max-width: 30%">
               <q-item>
                 <q-item-section avatar>
                   <q-avatar>
